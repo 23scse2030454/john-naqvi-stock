@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -12,6 +11,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ClipboardList,
+  Trash2,
 } from "lucide-react";
 
 // const API_URL = "http://localhost:5000/api";
@@ -468,6 +468,40 @@ function App() {
   };
 
   // =====================================================
+  // DELETE PRODUCT (NEW)
+  // =====================================================
+  const handleDelete = async (productId, productName) => {
+    const confirmed = window.confirm(
+      `"${productName}" ko delete karna hai?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await axios.delete(
+        `${API_URL}/products/${productId}`
+      );
+
+      // Card turant screen se hata do
+      setAllProducts((current) =>
+        current.filter(
+          (product) => product._id !== productId
+        )
+      );
+    } catch (error) {
+      console.error(
+        "Error deleting product:",
+        error
+      );
+
+      alert(
+        error.response?.data?.error ||
+          "Unable to delete product."
+      );
+    }
+  };
+
+  // =====================================================
   // PRODUCT PAGE SAFETY
   // =====================================================
   useEffect(() => {
@@ -840,16 +874,33 @@ function App() {
                         </div>
                       )}
 
-                      <button
-                        onClick={() =>
-                          handleSell(item._id)
-                        }
-                        disabled={quantity <= 0}
-                        className="w-full mt-4 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-300 disabled:cursor-not-allowed active:scale-95 text-white p-2.5 rounded-xl shadow transition-all flex items-center justify-center gap-2 font-bold text-sm"
-                      >
-                        <Minus className="w-4 h-4" />
-                        Sell 1
-                      </button>
+                      <div className="flex gap-2 mt-4">
+
+                        <button
+                          onClick={() =>
+                            handleSell(item._id)
+                          }
+                          disabled={quantity <= 0}
+                          className="flex-1 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-300 disabled:cursor-not-allowed active:scale-95 text-white p-2.5 rounded-xl shadow transition-all flex items-center justify-center gap-2 font-bold text-sm"
+                        >
+                          <Minus className="w-4 h-4" />
+                          Sell 1
+                        </button>
+
+                        <button
+                          onClick={() =>
+                            handleDelete(
+                              item._id,
+                              item.name
+                            )
+                          }
+                          className="bg-red-500 hover:bg-red-600 active:scale-95 text-white px-4 py-2.5 rounded-xl shadow transition-all flex items-center justify-center gap-2 font-bold text-sm"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Delete
+                        </button>
+
+                      </div>
 
                     </div>
                   );
@@ -1196,4 +1247,3 @@ function App() {
 }
 
 export default App;
-

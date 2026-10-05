@@ -1,4 +1,3 @@
-
 import { Schema, model } from "mongoose";
 
 // ===============================
@@ -119,6 +118,35 @@ export const addProduct = async (req, res) => {
     });
 
     return res.status(201).json(newProduct);
+
+  } catch (err) {
+    return res.status(500).json({
+      error: err.message
+    });
+  }
+};
+
+
+// ===============================
+// 1B. DELETE PRODUCT  (NEW)
+// ===============================
+
+export const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deleted = await Product.findByIdAndDelete(id);
+
+    if (!deleted) {
+      return res.status(404).json({
+        error: "Product not found"
+      });
+    }
+
+    return res.json({
+      message: "Product deleted successfully",
+      id
+    });
 
   } catch (err) {
     return res.status(500).json({
@@ -358,7 +386,7 @@ export const getDailyStats = async (req, res) => {
         $gte: startOfDay,
         $lte: endOfDay
       }
-    });
+    }).sort({ saleDate: -1 });
 
 
     // ===============================
@@ -413,6 +441,8 @@ export const getDailyStats = async (req, res) => {
 
       salesCount: salesToday.length,
 
+      salesList: salesToday,   // NEW: har sale ka name, quantity, sellingPrice, totalAmount
+
       lowStockCount: lowStockItems.length,
 
       lowStockList: lowStockItems
@@ -424,7 +454,6 @@ export const getDailyStats = async (req, res) => {
     });
   }
 };
-
 
 // ### Tumhare original code mein main errors
 
